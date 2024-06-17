@@ -1,37 +1,9 @@
-SmartStroll
-SmartStroll is an application that optimizes your walking routes based on your starting address and desired walking distance. By utilizing a custom graph-building algorithm and the Dijkstra's algorithm, SmartStroll provides the most efficient and enjoyable walking routes, allowing you to explore more landmarks within your preferred walking capacity.
+Smart Stroll
 
-Features
-Optimized Walking Routes: Generates the most efficient route based on your starting address and walking distance.
-Landmark Exploration: Includes notable landmarks in your walking route, maximizing the number of landmarks visited within your walking capacity.
-Custom Graph Building: Uses Euclidean distance calculations to create a graph of landmarks and their distances from each other and the starting point.
-Installation
-To run SmartStroll locally, follow these steps:
+Smart Stroll is a web application designed to help users optimize their walking routes to visit multiple tourist sites within a given time limit. The application allows users to input their start address, city, and maximum walking time, and it returns an optimized path of tourist sites to visit. The optimization is achieved using a modified Dijkstra's algorithm, which creates a graph of landmarks and calculates the best path within the specified walking time and a set vertex capacity.
 
-Clone the repository:
+To set up the project, ensure you have Python installed. Create a virtual environment and install the required dependencies listed in the `requirements.txt` file. Once the environment is set up, you can start the Flask application by running the command `python -m flask run`. This will launch the web server, allowing you to access the application in your browser.
 
-sh
-Copy code
-git clone https://github.com/abheejani/SmartStroll.git
-cd SmartStroll
-Install dependencies:
+The application uses a JSON file to store graph data, which includes the connections between various landmarks and their distances. The `dijkstra_max_vertices_with_capacity` function calculates the optimal path by considering the walking time and a vertex capacity limit. The graph is built using the `build_graph` function, which calculates the distances between landmarks based on their geographical coordinates.
 
-sh
-Copy code
-pip install -r requirements.txt
-Set up environment variables:
-Create a .env file in the root directory and add your environment variables:
-
-makefile
-Copy code
-START_ADDRESS="your_starting_address"
-CITY="your_city"
-Run the application:
-
-sh
-Copy code
-python main.py
-Usage
-Set Preferences: Define your starting address and walking distance.
-Generate Route: The application will generate the most optimized route for your walk, including notable landmarks.
-Explore: Follow the suggested route to explore the landmarks efficiently.
+To run the application, navigate to the project directory, set up your environment, and run the Flask server. Input your desired start address, city, and maximum walking time into the form, and the application will display the optimized path of tourist sites for you to visit.
