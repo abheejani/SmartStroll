@@ -9,7 +9,7 @@ def index():
     if request.method == 'POST':
         start_address = request.form.get('start_address')
         city = request.form.get('city')
-        capacity = int(request.form.get('capacity'))  # Convert capacity to integer
+        capacity = int(request.form.get('capacity'))
 
         # Set the start address and city in GetSites
         GetSites.start_address = start_address
