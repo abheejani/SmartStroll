@@ -7,7 +7,7 @@ with open('graph.json', 'r') as f:
     graph = data['graph']
     landmarks = data['landmarks']
 
-def dijkstra_max_vertices_with_capacity(graph, start, capacity, vertCapacity = 20):
+def dijkstra_max_vertices_with_capacity(graph, start, capacity, vertCapacity=20):
     priority_queue = []
     start_element = (1, 0, start, [start])
     heapq.heappush(priority_queue, start_element)
@@ -21,21 +21,20 @@ def dijkstra_max_vertices_with_capacity(graph, start, capacity, vertCapacity = 2
         if len(current_path) > len(best_path):
             best_path = current_path
 
-        for neighbor, weight in graph[str(current_node)]:
-            if neighbor not in current_path:
-                new_distance = current_distance + weight
-                if new_distance <= capacity:
-                    new_num_vertices = num_vertices + 1
-                    if new_num_vertices >= vertCapacity: 
-                        break
-                    new_path = current_path + [neighbor]
-                    new_element = (-new_num_vertices, new_distance, neighbor, new_path)
-                    heapq.heappush(priority_queue, new_element)
-
-        if len(best_path) >= vertCapacity: 
-            break
+        if len(best_path) < vertCapacity:
+            for neighbor, weight in graph[str(current_node)]:
+                if neighbor not in current_path:
+                    new_distance = current_distance + weight
+                    if new_distance <= capacity:
+                        new_num_vertices = num_vertices + 1
+                        if new_num_vertices > vertCapacity:
+                            continue
+                        new_path = current_path + [neighbor]
+                        new_element = (-new_num_vertices, new_distance, neighbor, new_path)
+                        heapq.heappush(priority_queue, new_element)
 
     return best_path
+
 
 def main(capacity):
     # Read the graph and landmarks from the file
