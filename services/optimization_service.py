@@ -1,9 +1,6 @@
-# services/optimization_service.py
-
 import heapq
 
 def dijkstra_max_vertices_with_capacity(graph, start, capacity):
-    """Optimize the path within the given capacity using Dijkstra's algorithm."""
     priority_queue = [(1, 0, start, [start])]
     best_path = []
     visited = set()

@@ -1,5 +1,3 @@
-# services/site_service.py
-
 import requests
 from urllib.parse import quote_plus
 from config.api_config import API_KEY

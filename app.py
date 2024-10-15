@@ -1,5 +1,3 @@
-# app.py
-
 from flask import Flask, render_template, request
 
 from services.site_service import get_coordinates, get_famous_landmarks
@@ -26,10 +24,7 @@ def index():
         # Step 3: Optimize the path directly from the graph (from optimization_service)
         path = dijkstra_max_vertices_with_capacity(graph, start=0, capacity=capacity)
 
-        # Convert the path indices to landmark names for display
         path_names = [landmarks[node - 1]['name'] for node in path if node > 0]
-
-        # Render the result with the optimized path
         return render_template('index.html', path=path_names)
 
     return render_template('index.html', path=[])

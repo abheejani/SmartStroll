@@ -1,9 +1,6 @@
-# services/graph_service.py
-
 from math import radians, cos, sin, sqrt
 
 def euclidean_distance(coord1, coord2):
-    """Calculate the Euclidean distance between two coordinates."""
     lat1, lon1 = map(radians, coord1)
     lat2, lon2 = map(radians, coord2)
     dlat, dlon = lat2 - lat1, lon2 - lon1
@@ -11,7 +8,6 @@ def euclidean_distance(coord1, coord2):
     return 2 * sqrt(a) * 6371 * 1000  # Distance in meters
 
 def build_graph(start_coordinates, landmarks):
-    """Build a graph with landmarks and their distances from the start address."""
     average_pace = 1.4  # meters/second
     graph = {i: [] for i in range(len(landmarks) + 1)}  # +1 for the start node (vertex 0)
 
