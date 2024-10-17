@@ -1,7 +1,10 @@
 import requests
 from urllib.parse import quote_plus
 from config.api_config import API_KEY
-from services.graph_service import build_graph
+
+import requests
+from urllib.parse import quote_plus
+from config.api_config import API_KEY
 
 def get_coordinates(address):
     """Get the latitude and longitude of an address."""
@@ -30,7 +33,16 @@ def get_famous_landmarks(city, radius=10000):
         response = requests.get(url)
         if response.ok:
             data = response.json()
-            landmarks.extend(data.get("results", []))
+            results = data.get("results", [])
+            
+            # Filter out landmarks with missing or invalid geometry/location
+            for landmark in results:
+                geometry = landmark.get("geometry", {})
+                location = geometry.get("location", {})
+                if location.get("lat") is not None and location.get("lng") is not None:
+                    landmarks.append(landmark)
+
+            # Handle pagination with next_page_token if needed
             next_page_token = data.get("next_page_token")
             if next_page_token:
                 url = f"https://maps.googleapis.com/maps/api/place/textsearch/json?pagetoken={next_page_token}&key={API_KEY}"
@@ -38,4 +50,5 @@ def get_famous_landmarks(city, radius=10000):
                 url = None
         else:
             break
-    return landmarks[:20]
+
+    return landmarks[:20]  # Return the first 20 valid landmarks

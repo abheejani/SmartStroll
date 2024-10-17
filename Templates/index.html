@@ -1,30 +1,41 @@
+<!-- eslint-disable -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tourist Sites Optimizer</title>
+    <title>Smart Stroll</title>
     <style>
         /* Global Styles */
         body {
-            background-color: #1b1b1b;
+            background-color: #2a2a2a;
             color: #e6e6e6;
             font-family: 'Arial', sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: auto;
             margin: 0;
+            padding: 0;
+            display: flex;
+            height: 100vh;
         }
 
-        /* Container for the form */
-        .container {
-            background-color: #2a2a2a;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        .content {
+            display: flex;
+            flex-direction: row;
             width: 100%;
-            max-width: 400px;
+        }
+
+        .map-container {
+            flex: 2;
+            padding: 10px;
+        }
+
+        .form-container {
+        flex: 1;
+        background-color: #2a2a2a;
+        padding: 40px;
+        border-left: 2px solid #444;
+        box-shadow: -4px 0 8px rgba(0, 0, 0, 0.2);
+        overflow-y: auto; /* Add scroll bar when necessary */
+        max-height: 100vh; /* Limit the height to prevent overflow */
         }
 
         h1 {
@@ -66,10 +77,11 @@
             background-color: #d55a5a;
         }
 
-        /* List styling */
         ul {
-            list-style-type: none;
-            padding: 0;
+        list-style-type: none;
+        padding: 0;
+        max-height: 300px; /* Adjust height based on your preference */
+        overflow-y: auto;  /* Allow vertical scrolling for long lists */
         }
 
         li {
@@ -77,6 +89,11 @@
             margin: 5px 0;
             padding: 10px;
             border-radius: 4px;
+            cursor: pointer; /* Make list items clickable */
+        }
+
+        li:hover {
+            background-color: #555; /* Hover effect for list items */
         }
 
         h2 {
@@ -84,32 +101,137 @@
             text-align: center;
             margin-top: 30px;
         }
+
+        /* Map container */
+        #map {
+            height: 100%;
+            width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Tourist Sites Optimizer</h1>
-        <form method="post">
-            <label for="start_address">Start Address:</label>
-            <input type="text" id="start_address" name="start_address" required>
+    <div class="content">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+        <div class="form-container">
+            <h1>Smart Stroll</h1>
+            <form method="POST">
+                <label for="start_address">Start Address:</label>
+                <input type="text" id="start_address" name="start_address" value="{{ start_address }}" required>
+            
+                <label for="city">City:</label>
+                <input type="text" id="city" name="city" value="{{ city }}" required>
+            
+                <label for="capacity">Maximum Walking Time (minutes):</label>
+                <input type="number" id="capacity" name="capacity" value="{{ capacity }}" required>
+            
+                <input type="submit" value="Optimize Route">
+            </form>            
 
-            <label for="city">City:</label>
-            <input type="text" id="city" name="city" required>
-
-            <label for="capacity">Maximum Walking Time (minutes):</label>
-            <input type="number" id="capacity" name="capacity" required>
-
-            <input type="submit" value="Optimize Route">
-        </form>
-
-        {% if path %}
-            <h2>Optimized Path:</h2>
-            <ul>
-                {% for node in path %}
-                    <li>{{ node }}</li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+            <!-- Display the optimized path -->
+            <div id="path-section" style="display: none;">
+                <h2>Optimized Path:</h2>
+                <ul id="path-list"></ul>
+            </div>
+        </div>
     </div>
+
+    <!-- Hidden input to store the path as a JSON string -->
+    <input type="hidden" id="hidden-path" value='{{ path|tojson }}'>
+
+    <script>
+        let map;
+        let markers = [];
+
+        function initMap() {
+            // Initialize the map
+            console.log("Initializing the map...");
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 14,
+                center: { lat: 40.1164, lng: -88.2434 },  // Default center (Champaign, IL)
+            });
+
+            // Directions services
+            const directionsService = new google.maps.DirectionsService();
+            const directionsRenderer = new google.maps.DirectionsRenderer();
+            directionsRenderer.setMap(map);
+
+            // Retrieve path names and coordinates from Flask
+            const pathNames = {{ path|tojson }};
+            const pathCoords = {{ path_coords|tojson }};
+
+            console.log("Path Names:", pathNames);
+            console.log("Path Coordinates:", pathCoords);
+
+            // Plot the starting point if it exists
+            if (pathCoords && pathCoords.length > 0) {
+                console.log("Valid pathCoords found with length:", pathCoords.length);
+
+                // Build waypoints using coordinates
+                const waypoints = pathCoords.slice(1, -1).map((coord) => {
+                    console.log("Waypoint:", coord); // Print out each waypoint
+                    return { location: { lat: coord.lat, lng: coord.lng }, stopover: true };
+                });
+
+                const request = {
+                    origin: { lat: pathCoords[0].lat, lng: pathCoords[0].lng },  // Start as the origin
+                    destination: { lat: pathCoords[pathCoords.length - 1].lat, lng: pathCoords[pathCoords.length - 1].lng },  // Last as the destination
+                    waypoints: waypoints,
+                    travelMode: google.maps.TravelMode.WALKING,
+                };
+
+                console.log("Request Object:", request);
+
+                directionsService.route(request, (result, status) => {
+                    console.log("Directions Service Status:", status);  // Print the status of the directions request
+                    if (status === google.maps.DirectionsStatus.OK) {
+                        directionsRenderer.setDirections(result);
+                        console.log("Directions successfully rendered.");
+                    } else {
+                        console.error('Directions request failed due to ' + status);
+                    }
+
+                    // Show the path on the list
+                    const pathList = document.getElementById('path-list');
+                    pathNames.forEach((name, index) => {
+                        const li = document.createElement('li');
+                        li.textContent = name;
+                        li.addEventListener('click', () => {
+                            console.log(`Centering map on: ${name}`);
+                            map.setCenter({ lat: pathCoords[index].lat, lng: pathCoords[index].lng });
+                            map.setZoom(16);  // Adjust the zoom level when centered
+                        });
+                        pathList.appendChild(li);
+                    });
+                    document.getElementById('path-section').style.display = 'block';  // Show the path section
+                });
+
+            } else {
+                console.warn("No valid pathCoords found.");
+            }
+
+        }
+
+        // Adds a marker to the map and stores it in the array
+        function addMarker(location, title) {
+            console.log("Adding marker at location:", location);
+            const marker = new google.maps.Marker({
+                position: location,
+                map: map,
+                title: title  // Add title to show the name of the location
+            });
+            markers.push(marker);
+        }
+    </script>
+
+    <!-- Load Google Maps script -->
+    <script async defer
+        src="https://maps.googleapis.com/maps/api/js?key={{ api_key }}&callback=initMap">
+    </script>
+
 </body>
 </html>
