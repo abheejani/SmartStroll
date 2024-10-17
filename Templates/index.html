@@ -160,9 +160,8 @@
             const directionsRenderer = new google.maps.DirectionsRenderer();
             directionsRenderer.setMap(map);
 
-            // Retrieve path names and coordinates from Flask
-            const pathNames = {{ path|tojson }};
-            const pathCoords = {{ path_coords|tojson }};
+            const pathNames = JSON.parse('{{ path|tojson|safe }}');
+            const pathCoords = JSON.parse('{{ path_coords|tojson|safe }}');
 
             console.log("Path Names:", pathNames);
             console.log("Path Coordinates:", pathCoords);
