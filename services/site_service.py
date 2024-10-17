@@ -34,15 +34,16 @@ def get_famous_landmarks(city, radius=10000):
         if response.ok:
             data = response.json()
             results = data.get("results", [])
-            
+            seen_names = set()
+            seen_names.add(city.strip().lower())
             # Filter out landmarks with missing or invalid geometry/location
             for landmark in results:
                 geometry = landmark.get("geometry", {})
                 location = geometry.get("location", {})
                 if location.get("lat") is not None and location.get("lng") is not None: # needs to be a valid location
-                    if not landmark.get('name', '').strip().lower() == city.strip().lower(): # needs to not be same the same spot as the city itself
+                    if landmark.get('name', '').strip().lower() not in seen_names: # different than city and other sites
                         landmarks.append(landmark)
-                        print(landmark.get('name', '') + str( "and the name of the city is ") + city.strip())
+                        seen_names.add(landmark.get('name', '').strip().lower())
 
             # Handle pagination with next_page_token if needed
             next_page_token = data.get("next_page_token")
