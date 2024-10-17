@@ -49,16 +49,10 @@ Here’s how you can run **SmartStroll** on your local machine:
    venv\Scripts\activate     # On Windows
    ```
 
-3. **Install Dependencies**  
-   Install the required Python packages from `requirements.txt`:
-   ```bash
-   pip install -r requirements.txt
+3. **Set Up Your API Key**
+   In the api_config.py file, please update it with your API key you generated
    ```
-
-4. **Set Up Your API Key**  
-   Create a **`.env`** file in the root directory and add your Google API key:
-   ```
-   GOOGLE_API_KEY=your-google-api-key-here
+   API_KEY = os.getenv("GOOGLE_API_KEY", "{YOUR API KEY HERE}")
    ```
 
 5. **Run the Application**  
