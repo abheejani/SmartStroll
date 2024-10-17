@@ -39,8 +39,10 @@ def get_famous_landmarks(city, radius=10000):
             for landmark in results:
                 geometry = landmark.get("geometry", {})
                 location = geometry.get("location", {})
-                if location.get("lat") is not None and location.get("lng") is not None:
-                    landmarks.append(landmark)
+                if location.get("lat") is not None and location.get("lng") is not None: # needs to be a valid location
+                    if not landmark.get('name', '').strip().lower() == city.strip().lower(): # needs to not be same the same spot as the city itself
+                        landmarks.append(landmark)
+                        print(landmark.get('name', '') + str( "and the name of the city is ") + city.strip())
 
             # Handle pagination with next_page_token if needed
             next_page_token = data.get("next_page_token")
@@ -51,4 +53,4 @@ def get_famous_landmarks(city, radius=10000):
         else:
             break
 
-    return landmarks[:20]  # Return the first 20 valid landmarks
+    return landmarks[:30]  # Return the first 30 valid landmarks
