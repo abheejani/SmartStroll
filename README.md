@@ -70,6 +70,7 @@ Here’s how you can run **SmartStroll** on your local machine:
      ```bash
      export GOOGLE_API_KEY=your-api-key-here
      ```
+   - If this method dones't work, update the api_config.py file directly
 
 4. **Run the Application**
 
