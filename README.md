@@ -20,7 +20,7 @@ Welcome to **SmartStroll**, your personalized travel companion! This application
 
 ---
 
-## **Getting Started **
+## **Getting Started**
 
 Here’s how you can run **SmartStroll** on your local machine:
 
